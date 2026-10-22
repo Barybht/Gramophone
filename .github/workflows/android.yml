@@ -89,16 +89,15 @@ jobs:
 
       - name: Upload files to Telegram
         if: github.event_name != 'pull_request'
-        uses: xz-dev/TelegramFileUploader@v1.1.1
-        with:
-          to-who: ${{ secrets.TG_CHAT_ID }}
-          message: ${{ env.RANDOM_QUOTE }}
-          files: |
-            ${{ env.APK_FILE }}
         env:
-          API_ID: ${{ secrets.TG_APP_ID }}
-          API_HASH: ${{ secrets.TG_APP_HASH }}
           BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: |
+          curl --fail --silent --show-error \
+            --form "chat_id=$CHAT_ID" \
+            --form "caption=$RANDOM_QUOTE" \
+            --form "document=@$APK_FILE" \
+            "https://api.telegram.org/bot$BOT_TOKEN/sendDocument"
 
       - name: Upload apk
         if: github.event_name == 'pull_request'
